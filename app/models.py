@@ -101,6 +101,11 @@ class StorageNode:
         conn.close()
         return rows
 
+    # Compatibility helper used by EnergyGuardRing
+    def get_all_data(self):
+        """Return all key/value pairs stored in the node."""
+        return self.get_all_keys()
+
 
 class MeasurementReplicationManager:
     def __init__(self, num_nodes=3, port=5000, strategy='full', replication_factor=None):

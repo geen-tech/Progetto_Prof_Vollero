@@ -49,6 +49,21 @@ class EnergyGuardRing:
 
         return selected_nodes
 
+    # Alias used by MeasurementReplicationManager
+    def get_nodes_for_key(self, key):
+        """Return the list of nodes responsible for ``key``."""
+        return self.get_responsible_nodes(key)
+
+    def get_node(self, key):
+        """Return the first alive node responsible for ``key``.
+
+        If no responsible node is alive, ``None`` is returned.
+        """
+        for node in self.get_responsible_nodes(key):
+            if node.is_alive():
+                return node
+        return None
+
     def get_next_active_node(self, key, exclude_node_id=None):
         if not self.ring:
             return None
