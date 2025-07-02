@@ -28,13 +28,13 @@ class TestPerformanceFull(unittest.TestCase):
     def test_write_performance_full(self):
         start_time = time.time()
         for i in range(self.range_to_test):
-            self.replication_manager_full.ingest_measurement(f'key_{i}', f'value_{i}')
+            self.replication_manager_full.store_measurement(f'key_{i}', f'value_{i}')
         end_time = time.time()
         TestPerformanceFull.results['Write performance (full)'] = end_time - start_time
 
     def test_read_performance_full(self):
         for i in range(self.range_to_test):
-            self.replication_manager_full.ingest_measurement(f'key_{i}', f'value_{i}')
+           self.replication_manager_full.store_measurement(f'key_{i}', f'value_{i}')
         start_time = time.time()
         for i in range(self.range_to_test):
             self.replication_manager_full.retrieve_measurement(f'key_{i}')
@@ -43,7 +43,7 @@ class TestPerformanceFull(unittest.TestCase):
 
     def test_fail_recover_performance_full(self):
         for i in range(self.range_to_test):
-            self.replication_manager_full.ingest_measurement(f'key_{i}', f'value_{i}')
+            self.replication_manager_full.store_measurement(f'key_{i}', f'value_{i}')
         start_time = time.time()
         for node_id in range(self.nodes_db):
             self.replication_manager_full.fail_node(node_id)
@@ -83,13 +83,13 @@ class TestPerformanceConsistent(unittest.TestCase):
     def test_write_performance_consistent(self):
         start_time = time.time()
         for i in range(self.range_to_test):
-            self.replication_manager_consistent.ingest_measurement(f'key_{i}', f'value_{i}')
+            self.replication_manager_consistent.store_measurement(f'key_{i}', f'value_{i}')
         end_time = time.time()
         TestPerformanceConsistent.results['Write performance (consistent)'] = end_time - start_time
 
     def test_read_performance_consistent(self):
         for i in range(self.range_to_test):
-            self.replication_manager_consistent.ingest_measurement(f'key_{i}', f'value_{i}')
+            self.replication_manager_consistent.store_measurement(f'key_{i}', f'value_{i}')
         start_time = time.time()
         for i in range(self.range_to_test):
             self.replication_manager_consistent.retrieve_measurement(f'key_{i}')
@@ -98,7 +98,7 @@ class TestPerformanceConsistent(unittest.TestCase):
 
     def test_fail_recover_performance_consistent(self):
         for i in range(self.range_to_test):
-            self.replication_manager_consistent.ingest_measurement(f'key_{i}', f'value_{i}')
+            self.replication_manager_consistent.store_measurement(f'key_{i}', f'value_{i}')
         start_time = time.time()
         for node_id in range(self.nodes_db):
             self.replication_manager_consistent.fail_node(node_id)

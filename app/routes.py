@@ -29,7 +29,7 @@ def register_routes(app, config):
     API_TOKEN = config.get('API_TOKEN')
 
     # Inizializza il gestore della replica per EnergyGuard
-    replication_manager = MeasurementReplicationManager(nodes_db=nodes_db, port=port)
+    replication_manager = MeasurementReplicationManager(num_nodes=nodes_db, port=port)
 
      # Endpoint per salvare una misurazione energetica
     @app.route('/ingest', methods=['POST'])
@@ -117,7 +117,7 @@ def register_routes(app, config):
     @require_api_token
     def get_node_status():
         try:
-            return jsonify({'status': 'success', 'nodes': replication_manager.get_nodes_status()})
+           return jsonify({'status': 'success', 'nodes': replication_manager.get_storage_status()})
         except Exception as e:
             return jsonify({'error': 'Internal server error', 'message': str(e)}), 500
 
@@ -143,7 +143,15 @@ def register_routes(app, config):
         try:
             nodes = replication_manager.get_responsible_nodes(sensor_key)
             if nodes:
-                return jsonify({'status': 'success', 'nodes': nodes})
+                nodes_info = [
+                    {
+                        'node_id': n.node_id,
+                        'status': 'alive' if n.is_alive() else 'dead',
+                        'port': n.port
+                    }
+                    for n in nodes
+                ]
+                return jsonify({'status': 'success', 'nodes': nodes_info})
             else:
                 return jsonify({'error': 'Strategy error', 'message': 'Consistent hashing is not active'}), 400
         except Exception as e:
