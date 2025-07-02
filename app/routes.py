@@ -31,13 +31,36 @@ def register_routes(app, config):
     # Inizializza il gestore della replica per EnergyGuard
     replication_manager = MeasurementReplicationManager(nodes_db=nodes_db, port=port)
 
-    # Endpoint per inviare una misurazione energetica
+     # Endpoint per salvare una misurazione energetica
     @app.route('/ingest', methods=['POST'])
+    @app.route('/ingest', methods=['POST'])
+    @require_api_token
+    @require_api_token
+    def ingest_measurement():
+        data = request.json
+        required = {'sensor_id', 'timestamp', 'value'}
+        if not data or not required.issubset(data):
+            return jsonify({'error': 'Invalid input',
+                            'message': 'sensor_id, timestamp and value are required'}), 400
+        try:
+            sensor_id = data['sensor_id']
+            timestamp = data['timestamp']
+            value = data['value']
+            key = f"{sensor_id}:{timestamp}"
+            replication_manager.store_measurement(key, value)
+            return jsonify({'status': 'success',
+                            'message': f'Measurement {key} stored successfully'})
+        except Exception as e:
+            return jsonify({'error': 'Internal server error', 'message': str(e)}), 500
+
+    # Endpoint per impostare la soglia di un sensore
+    @app.route('/set_threshold', methods=['POST'])
     @require_api_token
     def set_threshold():
         data = request.json
-        if 'sensor_id' not in data or 'threshold' not in data:
-            return jsonify({'error': 'Invalid input', 'message': 'sensor_id and threshold are required'}), 400
+        if not data or 'sensor_id' not in data or 'threshold' not in data:
+            return jsonify({'error': 'Invalid input',
+                            'message': 'sensor_id and threshold are required'}), 400
         try:
             sensor_id = data['sensor_id']
             threshold = float(data['threshold'])
