@@ -33,8 +33,6 @@ def register_routes(app, config):
 
      # Endpoint per salvare una misurazione energetica
     @app.route('/ingest', methods=['POST'])
-    @app.route('/ingest', methods=['POST'])
-    @require_api_token
     @require_api_token
     def ingest_measurement():
         data = request.json
@@ -89,7 +87,7 @@ def register_routes(app, config):
         try:
             if not replication_manager.measurement_exists(sensor_key):
                 return jsonify({'error': 'Measurement not found', 'message': 'Measurement does not exist'}), 404
-            replication_manager.remove_measurement(sensor_key)
+            replication_manager.delete_measurement(sensor_key)
             return jsonify({'status': 'success', 'message': f'Measurement {sensor_key} deleted successfully'})
         except Exception as e:
             return jsonify({'error': 'Internal server error', 'message': str(e)}), 500

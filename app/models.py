@@ -116,12 +116,12 @@ class MeasurementReplicationManager:
         self.alert_manager = AlertManager()
 
         if strategy == 'consistent':
-            self.hash_ring = EnergyGuardRing(self.nodes, replicas=replication_factor)
+            self.hash_ring = EnergyGuardRing(self.nodes, replication_factor=replication_factor)
 
     def set_replication_strategy(self, strategy, replication_factor=None):
         self.strategy = strategy
         if strategy == 'consistent':
-            self.hash_ring = EnergyGuardRing(self.nodes, replicas=replication_factor)
+            self.hash_ring = EnergyGuardRing(self.nodes, replication_factor=replication_factor)
         else:
             self.hash_ring = None
 
