@@ -167,7 +167,16 @@ class MeasurementReplicationManager:
             if node.is_alive() and node.key_exists(key):
                 return True
         return False
-
+    
+    def get_all_measurements(self):
+        """Return all key/value pairs available across alive nodes."""
+        measurements = {}
+        for node in self.nodes:
+            if node.is_alive():
+                for key, value in node.get_all_keys():
+                    measurements[key] = value
+        return measurements
+    
     def fail_node(self, node_id):
         if 0 <= node_id < len(self.nodes):
             node = self.nodes[node_id]

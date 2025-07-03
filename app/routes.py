@@ -30,6 +30,11 @@ def register_routes(app, config):
 
     # Inizializza il gestore della replica per EnergyGuard
     replication_manager = MeasurementReplicationManager(num_nodes=nodes_db, port=port)
+    
+    # Endpoint di default per verificare lo stato del servizio
+    @app.route('/')
+    def index():
+        return jsonify({'status': 'EnergyGuard API running'})
 
      # Endpoint per salvare una misurazione energetica
     @app.route('/ingest', methods=['POST'])
@@ -163,5 +168,25 @@ def register_routes(app, config):
         try:
             alerts = replication_manager.alert_manager.get_alerts()
             return jsonify({'status': 'success', 'alerts': alerts})
+        except Exception as e:
+            return jsonify({'error': 'Internal server error', 'message': str(e)}), 500
+
+    @app.route('/measurements', methods=['GET'])
+    @require_api_token
+    def get_all_measurements_route():
+        try:
+            measurements = replication_manager.get_all_measurements()
+            return jsonify({'status': 'success', 'measurements': measurements})
+        except Exception as e:
+            return jsonify({'error': 'Internal server error', 'message': str(e)}), 500
+
+    @app.route('/sensor/<sensor_id>/history', methods=['GET'])
+    @require_api_token
+    def get_sensor_history(sensor_id):
+        try:
+            prefix = f"{sensor_id}:"
+            all_measurements = replication_manager.get_all_measurements()
+            filtered = {k: v for k, v in all_measurements.items() if k.startswith(prefix)}
+            return jsonify({'status': 'success', 'measurements': filtered})
         except Exception as e:
             return jsonify({'error': 'Internal server error', 'message': str(e)}), 500
