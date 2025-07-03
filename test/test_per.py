@@ -2,6 +2,7 @@ import os
 import sys
 import unittest
 import time
+import json
 
 # Aggiungi il percorso del progetto alla variabile sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -12,7 +13,7 @@ class TestPerformanceFull(unittest.TestCase):
     results = {}
 
     def setUp(self):
-        self.range_to_test = 5
+        self.range_to_test = 20
         self.nodes_db = 3
         self.replication_factor = 2
         self.replication_manager_full = MeasurementReplicationManager(
@@ -61,6 +62,23 @@ class TestPerformanceFull(unittest.TestCase):
         print("\n\n--- Performance Results Full Strategy ---")
         for test, duration in cls.results.items():
             print(f'{test}: {duration:.4f} seconds')
+    @classmethod
+    def tearDownClass(cls):
+        cls.parsed_results = {
+            'Write': cls.results['Write performance (full)'],
+            'Read': cls.results['Read performance (full)'],
+            'Fail': cls.results['Fail nodes performance (full)'],
+            'Recover': cls.results['Recover nodes performance (full)'],
+        }
+        print("\n--- Performance Results Full Strategy ---")
+        for test, duration in cls.parsed_results.items():
+            print(f'{test}: {duration:.4f} seconds')
+
+        with open("results_full.json", "w") as f:
+            json.dump(cls.parsed_results, f, indent=4)
+
+
+
 
 
 class TestPerformanceConsistent(unittest.TestCase):
@@ -116,6 +134,22 @@ class TestPerformanceConsistent(unittest.TestCase):
         print("\n\n--- Performance Results Consistent Strategy ---")
         for test, duration in cls.results.items():
             print(f'{test}: {duration:.4f} seconds')
+    
+    @classmethod
+    def tearDownClass(cls):
+        cls.parsed_results = {
+            'Write': cls.results['Write performance (consistent)'],
+            'Read': cls.results['Read performance (consistent)'],
+            'Fail': cls.results['Fail nodes performance (consistent)'],
+            'Recover': cls.results['Recover nodes performance (consistent)'],
+        }
+        print("\n--- Performance Results Consistent Strategy ---")
+        for test, duration in cls.parsed_results.items():
+            print(f'{test}: {duration:.4f} seconds')
+
+        with open("results_consistent.json", "w") as f:
+            json.dump(cls.parsed_results, f, indent=4)
+
 
 
 if __name__ == '__main__':
