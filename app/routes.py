@@ -1,8 +1,8 @@
 from flask import request, jsonify
 from functools import wraps
 from .models import MeasurementReplicationManager
-import json
-import os
+
+replication_manager = None  # sarà inizializzato una volta sola
 
 # Definisce i valori di configurazione predefiniti
 nodes_db = 3
@@ -20,16 +20,15 @@ def require_api_token(f):
 
 # Funzione per registrare le routes con l'app Flask
 def register_routes(app, config):
-    global nodes_db
-    global port
-    global API_TOKEN
+    global nodes_db, port, API_TOKEN, replication_manager
 
     nodes_db = config.get('nodes_db')
     port = config.get('port')
     API_TOKEN = config.get('API_TOKEN')
 
-    # Inizializza il gestore della replica per EnergyGuard
-    replication_manager = MeasurementReplicationManager(num_nodes=nodes_db, port=port)
+    if replication_manager is None:
+        replication_manager = MeasurementReplicationManager(num_nodes=nodes_db, port=port)
+
     
     # Endpoint di default per verificare lo stato del servizio
     @app.route('/')

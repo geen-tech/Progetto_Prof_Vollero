@@ -137,10 +137,12 @@ class MeasurementReplicationManager:
 
         # --- Controllo anomalie ---
         try:
-            sensor_id, timestamp = key.split(":")
+            sensor_id, timestamp = key.split(":", 1)  # dividi solo alla prima occorrenza
             self.alert_manager.check_for_anomaly(sensor_id, value, timestamp)
-        except ValueError:
-            pass
+        except Exception as e:
+            print(f"[ALERT ERROR] Failed to check anomaly for key {key}: {e}")
+
+
 
 
     def retrieve_measurement(self, key):
